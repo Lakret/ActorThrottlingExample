@@ -209,7 +209,7 @@ object Exercise2 {
             // with at most maxConcurrentRequests we can guarantee that each future
             // will execute not more than maxConcurrentRequests
             .grouped(maxConcurrentRequests)
-            .map(petIds => Future.traverse(petIds)(getPet).map(_.flatten))
+            .map(petIds => () => Future.traverse(petIds)(getPet).map(_.flatten))
 
         // we use this trick with folding and for comprehension
         // to guarantee that we execute subFutures one by one
@@ -217,7 +217,7 @@ object Exercise2 {
           (prevFuture, currFuture) => {
             for {
               prevPetsSubList <- prevFuture
-              next <- currFuture
+              next <- currFuture()
             } yield prevPetsSubList ++ next
           }
         }
